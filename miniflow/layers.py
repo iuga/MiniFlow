@@ -7,7 +7,7 @@ class Layer(object):
     Arguments:
         `inbounds`: A list of layers with edges into this node.
     """
-    def __init__(self, inbounds=[]):
+    def __init__(self, inbounds=[], trainable=True, name=None):
         """
         Layer's constructor (runs when the object is instantiated). Sets
         properties that all layers need.
@@ -22,6 +22,10 @@ class Layer(object):
         # their values are the partials of this node with
         # respect to that input.
         self.gradients = {}
+        # Is the layer trainable?
+        self.trainable = trainable
+        # Set a name, It's really cool for debugging
+        self.name = name
 
     def __call__(self, inbounds=[]):
         """
@@ -64,12 +68,12 @@ class Input(Layer):
     """
     A generic input into the network.
     """
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         # The base class constructor has to run to set all
         # the properties here.
         # The most important property on an Input is value.
         # self.value is set during `topological_sort` later.
-        Layer.__init__(self)
+        Layer.__init__(self, *args, **kwargs)
 
     def forward(self):
         # Do nothing because nothing is calculated.
@@ -91,10 +95,10 @@ class Linear(Layer):
     """
     Represents a node that performs a linear transform.
     """
-    def __init__(self, W, b):
+    def __init__(self, W, b, *args, **kwargs):
         # The base class constructor. Weights and bias
         # are treated like inbound nodes.
-        Layer.__init__(self)
+        Layer.__init__(self, *args,**kwargs)
         self.W = W
         self.b = b
         self.inbounds.append(W)
@@ -134,9 +138,9 @@ class Sigmoid(Layer):
     """
     Represents a node that performs the sigmoid activation function.
     """
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         # The base class constructor.
-        Layer.__init__(self)
+        Layer.__init__(self, *args, **kwargs)
 
     def _sigmoid(self, x):
         """

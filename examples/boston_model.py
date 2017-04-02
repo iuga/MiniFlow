@@ -27,9 +27,10 @@ W2 = np.random.randn(n_hidden, 1)
 b2 = np.zeros(1)
 
 # Neural network:
-Xi, yi = Input(), Input()
-W1i, b1i = Input(), Input()
-W2i, b2i = Input(), Input()
+Xi = Input(trainable=False, name="X_input")
+yi = Input(trainable=False, name="y_input")
+W1i, b1i = Input(name="W1"), Input(name="b1")
+W2i, b2i = Input(name="W2"), Input(name="b2")
 
 # Topology
 Xi = Input()
@@ -38,9 +39,6 @@ x = Sigmoid()(x)
 x = Linear(W2i, b2i)(x)
 cost = MSE(yi)(x)
 
-model = Model(inputs=[Xi], outputs=[cost])
-model.train()
-model.summary()
 
 feed_dict = {
     Xi: X,
@@ -51,35 +49,6 @@ feed_dict = {
     b2i: b2
 }
 
-epochs = 2000
-# Total number of examples
-m = X.shape[0]
-batch_size = 64
-steps_per_epoch = m // batch_size
-
-graph = topological_sort(feed_dict)
-trainables = [W1i, b1i, W2i, b2i]
-
-print("Total number of examples = {}".format(m))
-
-# Step 4
-for i in range(epochs):
-    loss = 0
-    for j in range(steps_per_epoch):
-        # Step 1
-        # Randomly sample a batch of examples
-        X_batch, y_batch = resample(X, y, n_samples=batch_size)
-
-        # Reset value of X and y Inputs
-        Xi.value = X_batch
-        yi.value = y_batch
-
-        # Step 2
-        forward_and_backward(graph)
-
-        # Step 3
-        sgd_update(trainables, learning_rate=0.05)
-
-        loss += graph[-1].value
-
-    print("Epoch: {}, Loss: {:.3f}".format(i + 1, loss / steps_per_epoch))
+model = Model(inputs=[Xi], outputs=[cost])
+model.train(X, y, Xi, yi, feed_dict=feed_dict, epochs=2000, batch_size=64, m=X.shape[0])
+model.summary()
