@@ -8,3 +8,6 @@ class Model(object):
 
     def train(self):
         pass
+
+    def summary(self):
+        print("Summary:")

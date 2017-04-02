@@ -27,7 +27,7 @@ class MSE(Layer):
         y = self.y_true.value.reshape(-1, 1)
         a = self.inbounds[0].value.reshape(-1, 1)
 
-        self.m = self.inbounds[0].value.shape[0]
+        self.m = self.y_true.value.shape[0]
         # Save the computed output for backward.
         self.diff = y - a
         self.value = np.mean(self.diff**2)

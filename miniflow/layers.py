@@ -24,15 +24,23 @@ class Layer(object):
         self.gradients = {}
 
     def __call__(self, inbounds=[]):
+        """
+        Call the Layer object with the inbound nodes and create the
+        links between them. The logic should be in call()
+        """
         return self.call(inbounds=inbounds)
 
     def call(self, inbounds=[]):
-        # A list of nodes with edges into this node.
-        self.inbounds = inbounds if isinstance(inbounds, list) else [inbounds]
-        # Sets this node as an outbound node for all of
-        # this node's inputs.
-        print("Layer:", self)
-        print("Inbounds:", self.inbounds)
+        """
+        Call the layer with the inbounds nodes ( previous layers in the net )
+        """
+        # A list of layers with edges into this layer.
+        inbounds = inbounds if isinstance(inbounds, list) else [inbounds]
+        for inbound in inbounds:
+            self.inbounds.insert(0, inbound)
+        # Sets this layer as an outbound layer for all of this layers's inputs.
+        # Link between this layer and the previous ones. In other words, fill the
+        # Outbounds from the previous layer with this one ( Create the connection ).
         for layer in self.inbounds:
             layer.outbounds.append(self)
         return self
@@ -59,7 +67,6 @@ class Input(Layer):
     def __init__(self):
         # The base class constructor has to run to set all
         # the properties here.
-        #
         # The most important property on an Input is value.
         # self.value is set during `topological_sort` later.
         Layer.__init__(self)
@@ -69,10 +76,11 @@ class Input(Layer):
         pass
 
     def backward(self):
-        # An Input node has no inputs so the gradient (derivative)
-        # is zero.
+        # An Input node has no inputs so the gradient (derivative) is zero.
         # The key, `self`, is reference to this object.
-        self.gradients = {self: 0}
+        self.gradients = {
+            self: 0
+        }
         # Weights and bias may be inputs, so you need to sum
         # the gradient from output gradients.
         for n in self.outbounds:
@@ -86,9 +94,11 @@ class Linear(Layer):
     def __init__(self, W, b):
         # The base class constructor. Weights and bias
         # are treated like inbound nodes.
+        Layer.__init__(self)
         self.W = W
         self.b = b
-        Layer.__init__(self)
+        self.inbounds.append(W)
+        self.inbounds.append(b)
 
     def forward(self):
         """
@@ -104,10 +114,9 @@ class Linear(Layer):
         Calculates the gradient based on the output values.
         """
         # Initialize a partial for each of the inbound_nodes.
-        # TODO: Fix This !
-        print("Inbounds:", self.inbounds)
         self.gradients = {n: np.zeros_like(n.value) for n in self.inbounds}
-        print("Gradients:", self.gradients.keys())
+        self.gradients[self.W] = np.zeros_like(self.W.value)
+        self.gradients[self.b] = np.zeros_like(self.b.value)
         # Cycle through the outputs. The gradient will change depending
         # on each output, so the gradients are summed over all outputs.
         for n in self.outbounds:

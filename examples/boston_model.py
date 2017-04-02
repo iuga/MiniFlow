@@ -17,7 +17,6 @@ print("Shapes X: {} y:{}".format(X.shape, y.shape))
 
 # Normalize data
 X = (X - np.mean(X, axis=0)) / np.std(X, axis=0)
-
 n_features = X.shape[1]
 n_hidden = 10
 
@@ -35,13 +34,13 @@ W2i, b2i = Input(), Input()
 # Topology
 Xi = Input()
 x = Linear(W1i, b1i)(Xi)
-print("x:", x)
 x = Sigmoid()(x)
 x = Linear(W2i, b2i)(x)
 cost = MSE(yi)(x)
 
 model = Model(inputs=[Xi], outputs=[cost])
 model.train()
+model.summary()
 
 feed_dict = {
     Xi: X,
@@ -83,5 +82,4 @@ for i in range(epochs):
 
         loss += graph[-1].value
 
-    print("Epoch: {}, Loss: {:.3f}".format(i+1, loss/steps_per_epoch))
-
+    print("Epoch: {}, Loss: {:.3f}".format(i + 1, loss / steps_per_epoch))
