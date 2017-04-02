@@ -37,8 +37,6 @@ Xi = Input()
 x = Linear(W1i, b1i)(Xi)
 x = Sigmoid()(x)
 x = Linear(W2i, b2i)(x)
-cost = MSE(yi)(x)
-
 
 feed_dict = {
     Xi: X,
@@ -49,6 +47,7 @@ feed_dict = {
     b2i: b2
 }
 
-model = Model(inputs=[Xi], outputs=[cost])
+model = Model(inputs=[Xi], outputs=[x])
+model.compile(loss='mse')
 model.train(X, y, Xi, yi, feed_dict=feed_dict, epochs=2000, batch_size=64, m=X.shape[0])
 model.summary()
