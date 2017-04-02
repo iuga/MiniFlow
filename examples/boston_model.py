@@ -18,7 +18,7 @@ print("Shapes X: {} y:{}".format(X.shape, y.shape))
 # Normalize data
 X = (X - np.mean(X, axis=0)) / np.std(X, axis=0)
 n_features = X.shape[1]
-n_hidden = 10
+n_hidden = 100
 
 # Layers Weights:
 W1 = np.random.randn(n_features, n_hidden)
@@ -49,5 +49,5 @@ feed_dict = {
 
 model = Model(inputs=[Xi], outputs=[x])
 model.compile(loss='mse')
-model.train(X, y, Xi, yi, feed_dict=feed_dict, epochs=2000, batch_size=64, m=X.shape[0])
+model.train(X, y, Xi, yi, feed_dict=feed_dict, epochs=1000, batch_size=32)
 model.summary()
