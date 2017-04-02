@@ -1,15 +1,15 @@
 import numpy as np
-from miniflow.topology import Node
+from miniflow.layers import Layer
 
 
-class MSE(Node):
-    def __init__(self, y, a):
+class MSE(Layer):
+    def __init__(self, y_true):
         """
         The mean squared error cost function.
         Should be used as the last node for a network.
         """
-        # Call the base class' constructor.
-        Node.__init__(self, [y, a])
+        self.y_true = y_true
+        Layer.__init__(self)
 
     def forward(self):
         """
@@ -24,10 +24,10 @@ class MSE(Node):
         #
         # Making both arrays (3,1) insures the result is (3,1) and does
         # an elementwise subtraction as expected.
-        y = self.inbound_nodes[0].value.reshape(-1, 1)
-        a = self.inbound_nodes[1].value.reshape(-1, 1)
+        y = self.y_true.value.reshape(-1, 1)
+        a = self.inbounds[0].value.reshape(-1, 1)
 
-        self.m = self.inbound_nodes[0].value.shape[0]
+        self.m = self.y_true.value.shape[0]
         # Save the computed output for backward.
         self.diff = y - a
         self.value = np.mean(self.diff**2)
@@ -36,5 +36,5 @@ class MSE(Node):
         """
         Calculates the gradient of the cost.
         """
-        self.gradients[self.inbound_nodes[0]] = (2 / self.m) * self.diff
-        self.gradients[self.inbound_nodes[1]] = (-2 / self.m) * self.diff
+        self.gradients[self.y_true] = (2 / self.m) * self.diff
+        self.gradients[self.inbounds[0]] = (-2 / self.m) * self.diff

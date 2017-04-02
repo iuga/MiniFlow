@@ -1,56 +1,65 @@
-import numpy as np
-
-class Node:
-    """
-    Base class for nodes in the network.
-
-    Arguments:
-
-        `inbound_nodes`: A list of nodes with edges into this node.
-    """
-    def __init__(self, inbound_nodes=[]):
-        """
-        Node's constructor (runs when the object is instantiated). Sets
-        properties that all nodes need.
-        """
-        # A list of nodes with edges into this node.
-        self.inbound_nodes = inbound_nodes
-        # The eventual value of this node. Set by running
-        # the forward() method.
-        self.value = None
-        # A list of nodes that this node outputs to.
-        self.outbound_nodes = []
-        # New property! Keys are the inputs to this node and
-        # their values are the partials of this node with
-        # respect to that input.
-        self.gradients = {}
-        # Sets this node as an outbound node for all of
-        # this node's inputs.
-        for node in inbound_nodes:
-            node.outbound_nodes.append(self)
-
-    def forward(self):
-        """
-        Every node that uses this class as a base class will
-        need to define its own `forward` method.
-        """
-        raise NotImplementedError
-
-    def backward(self):
-        """
-        Every node that uses this class as a base class will
-        need to define its own `backward` method.
-        """
-        raise NotImplementedError
+from miniflow.engine import topological_sort, forward_and_backward, sgd_update
+from sklearn.utils import resample
+from miniflow.losses import MSE
+from click import progressbar
 
 
 class Model(object):
     """
     Define a generic Network model topology
     """
+    losses = {
+        'mse': MSE
+    }
+
     def __init__(self, inputs, outputs):
         self.inputs = inputs
         self.outputs = outputs
+        self.optimizer = None
+        self.loss = None
 
-    def train(self):
-        pass
+    def compile(self, optimizer='sdg', loss='mse'):
+        """
+        Compile the model
+        """
+        # Create the Loss function as a layer:
+        self.loss = self.losses.get(loss, MSE)
+
+    def train(self, X_train, y_train, Xi, yi, feed_dict, epochs=1000, batch_size=128):
+        # Total number of examples
+        steps_per_epoch = X_train.shape[0] // batch_size
+        # Sort the graph
+        self.graph = topological_sort(feed_dict)
+        # Add the loss layer in the graph:
+        loss_layer = self.loss(yi)(self.outputs)
+        self.graph.append(loss_layer)
+        # Get all the trainables
+        trainables = []
+        for layer in feed_dict.keys():
+            if layer.trainable:
+                trainables.append(layer)
+
+        # Train the model:
+        for i in range(epochs):
+            loss = 0
+            with progressbar(range(steps_per_epoch), label='Training: ') as bar:
+                for j in bar:
+                    # Step 1
+                    # Randomly sample a batch of examples
+                    X_batch, y_batch = resample(X_train, y_train, n_samples=batch_size)
+
+                    # Reset value of X and y Inputs
+                    Xi.value = X_batch
+                    yi.value = y_batch
+
+                    # Step 2
+                    forward_and_backward(self.graph)
+
+                    # Step 3
+                    sgd_update(trainables, learning_rate=0.05)
+
+                    loss += self.graph[-1].value
+            print("Epoch: {}, Loss: {:.3f}".format(i + 1, loss / steps_per_epoch))
+
+    def summary(self):
+        print("Summary:")

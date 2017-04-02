@@ -8,6 +8,40 @@ It's a Small Deep Learning framework based on NymPy. The only purpose it has is 
 ```
 
 ## Examples:
+```python
+# Define all variables:
+Xi = Input(trainable=False, name="X_input")
+yi = Input(trainable=False, name="y_input")
+W1i, b1i = Input(name="W1"), Input(name="b1")
+W2i, b2i = Input(name="W2"), Input(name="b2")
+
+# Define the Network Topology
+Xi = Input()
+x = Linear(W1i, b1i)(Xi)
+x = Sigmoid()(x)
+x = Linear(W2i, b2i)(x)
+
+# Define the model:
+model = Model(inputs=[Xi], outputs=[x])
+# Compile the model
+model.compile(loss='mse')
+model.train(X, y, Xi, yi, epochs=1000, batch_size=32, feed_dict = {
+    Xi: X,
+    yi: y,
+    W1i: W1,
+    b1i: b1,
+    W2i: W2,
+    b2i: b2
+})
+```
 ```bash
-TBD
+Training:   [####################################]  100%
+Epoch: 1, Loss: 864.557
+Training:   [####################################]  100%
+Epoch: 2, Loss: 24.480
+Training:   [####################################]  100%
+Epoch: 3, Loss: 20.955
+...
+Training:   [####################################]  100%
+Epoch: 1000, Loss: 0.219
 ```
