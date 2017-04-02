@@ -35,6 +35,7 @@ W2i, b2i = Input(), Input()
 # Topology
 Xi = Input()
 x = Linear(W1i, b1i)(Xi)
+print("x:", x)
 x = Sigmoid()(x)
 x = Linear(W2i, b2i)(x)
 cost = MSE(yi)(x)
