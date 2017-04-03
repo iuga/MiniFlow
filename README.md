@@ -9,11 +9,13 @@ It's a Small Deep Learning framework based on NymPy. The only purpose it has is 
 
 ## Examples:
 ```python
-# Define all variables:
-Xi = Input(trainable=False, name="X_input")
-yi = Input(trainable=False, name="y_input")
-W1i, b1i = Input(name="W1"), Input(name="b1")
-W2i, b2i = Input(name="W2"), Input(name="b2")
+# Neural network inputs (X and y):
+Xi = Input(name="X_input")
+yi = Input(name="y_input")
+
+# Neural Network trainable parameter:
+W1i, b1i = Variable(name="W1"), Variable(name="b1")
+W2i, b2i = Variable(name="W2"), Variable(name="b2")
 
 # Define the Network Topology
 Xi = Input()
