@@ -44,7 +44,7 @@ class Model(object):
         # Train the model:
         for i in range(epochs):
             loss = 0
-            with progressbar(range(steps_per_epoch), label='Training: ') as bar:
+            with progressbar(range(steps_per_epoch), label='Epoch {}: '.format(i + 1)) as bar:
                 for j in bar:
                     # Step 1
                     # Randomly sample a batch of examples
@@ -62,7 +62,7 @@ class Model(object):
                     sgd_update(trainables, learning_rate=0.05)
 
                     loss += self.graph[-1].value
-            print("Epoch: {}, Loss: {:.3f}".format(i + 1, loss / steps_per_epoch))
+            print("Train Loss: {:.3f}".format(loss / steps_per_epoch))
 
     def summary(self):
         print("Summary:")

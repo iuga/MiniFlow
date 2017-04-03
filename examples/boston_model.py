@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.datasets import load_boston
 from miniflow.layers import Input, Linear, Sigmoid, Variable
 from miniflow.topology import Model
+from sklearn.model_selection import train_test_split
 
 # Load data
 data = load_boston()
@@ -14,7 +15,13 @@ print("Shapes X: {} y:{}".format(X.shape, y.shape))
 
 # Normalize data
 X = (X - np.mean(X, axis=0)) / np.std(X, axis=0)
-n_features = X.shape[1]
+
+# Split between train/test sets:
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
+print("Shapes X_train: {} y_train:{} X_test:{} y_test:{}".format(X_train.shape, y_train.shape, X_test.shape, y_test.shape))
+
+# Configuration
+n_features = X_train.shape[1]
 n_hidden = 100
 
 # Layers Weights:
@@ -46,4 +53,4 @@ feed_dict = {
 
 model = Model(inputs=[Xi], outputs=[x])
 model.compile(loss='mse')
-model.train(X, y, feed_dict=feed_dict, epochs=1000, batch_size=32)
+model.train(X_train, y_train, feed_dict=feed_dict, epochs=1000, batch_size=32)
