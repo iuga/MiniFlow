@@ -1,4 +1,5 @@
 from miniflow.engine import topological_sort, forward_and_backward, sgd_update
+from miniflow.layers import Input
 from sklearn.utils import resample
 from miniflow.losses import MSE
 from click import progressbar
@@ -25,20 +26,21 @@ class Model(object):
         # Create the Loss function as a layer:
         self.loss = self.losses.get(loss, MSE)
 
-    def train(self, X_train, y_train, Xi, yi, feed_dict, epochs=1000, batch_size=128):
+    def train(self, X_train, y_train, Xi, feed_dict, epochs=1000, batch_size=128):
         # Total number of examples
         steps_per_epoch = X_train.shape[0] // batch_size
         # Sort the graph
         self.graph = topological_sort(feed_dict)
+        # Network Inputs:
+        y_train_input = Input(trainable=False, name="y_input")
         # Add the loss layer in the graph:
-        loss_layer = self.loss(yi)(self.outputs)
+        loss_layer = self.loss(y_train_input)(self.outputs)
         self.graph.append(loss_layer)
         # Get all the trainables
         trainables = []
         for layer in feed_dict.keys():
             if layer.trainable:
                 trainables.append(layer)
-
         # Train the model:
         for i in range(epochs):
             loss = 0
@@ -50,7 +52,7 @@ class Model(object):
 
                     # Reset value of X and y Inputs
                     Xi.value = X_batch
-                    yi.value = y_batch
+                    y_train_input.value = y_batch
 
                     # Step 2
                     forward_and_backward(self.graph)
