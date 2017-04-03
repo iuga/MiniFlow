@@ -50,5 +50,5 @@ feed_dict = {
 model = Model(inputs=[Xi], outputs=[x])
 model.compile(loss='mse')
 # TODO: Create the yi inside the training. Also, Xi is already in the model. Moreover: x it's the network output
-model.train(X, y, Xi, feed_dict=feed_dict, epochs=1000, batch_size=32)
+model.train(X, y, feed_dict=feed_dict, epochs=1000, batch_size=32)
 model.summary()

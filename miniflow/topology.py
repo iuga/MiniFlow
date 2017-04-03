@@ -26,7 +26,7 @@ class Model(object):
         # Create the Loss function as a layer:
         self.loss = self.losses.get(loss, MSE)
 
-    def train(self, X_train, y_train, Xi, feed_dict, epochs=1000, batch_size=128):
+    def train(self, X_train, y_train, feed_dict, epochs=1000, batch_size=128):
         # Total number of examples
         steps_per_epoch = X_train.shape[0] // batch_size
         # Sort the graph
@@ -51,7 +51,8 @@ class Model(object):
                     X_batch, y_batch = resample(X_train, y_train, n_samples=batch_size)
 
                     # Reset value of X and y Inputs
-                    Xi.value = X_batch
+                    for input in self.inputs:
+                        input.value = X_batch
                     y_train_input.value = y_batch
 
                     # Step 2
