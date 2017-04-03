@@ -25,9 +25,7 @@ x = Linear(W2i, b2i)(x)
 model = Model(inputs=[Xi], outputs=[x])
 # Compile the model
 model.compile(loss='mse')
-model.train(X, y, Xi, yi, epochs=1000, batch_size=32, feed_dict = {
-    Xi: X,
-    yi: y,
+model.train(X, y, epochs=1000, batch_size=32, feed_dict = {
     W1i: W1,
     b1i: b1,
     W2i: W2,
