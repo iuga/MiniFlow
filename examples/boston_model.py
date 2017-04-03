@@ -3,10 +3,7 @@ Have fun with the number of epochs!
 """
 import numpy as np
 from sklearn.datasets import load_boston
-from sklearn.utils import shuffle, resample
-from miniflow.layers import Input, Linear, Sigmoid
-from miniflow.losses import MSE
-from miniflow.engine import topological_sort, forward_and_backward, sgd_update
+from miniflow.layers import Input, Linear, Sigmoid, Variable
 from miniflow.topology import Model
 
 # Load data
@@ -26,11 +23,13 @@ b1 = np.zeros(n_hidden)
 W2 = np.random.randn(n_hidden, 1)
 b2 = np.zeros(1)
 
-# Neural network:
-Xi = Input(trainable=False, name="X_input")
-yi = Input(trainable=False, name="y_input")
-W1i, b1i = Input(name="W1"), Input(name="b1")
-W2i, b2i = Input(name="W2"), Input(name="b2")
+# Neural network inputs (X and y):
+Xi = Input(name="X_input")
+yi = Input(name="y_input")
+
+# Neural Network trainable parameter:
+W1i, b1i = Variable(name="W1"), Variable(name="b1")
+W2i, b2i = Variable(name="W2"), Variable(name="b2")
 
 # Topology
 Xi = Input()
@@ -39,8 +38,6 @@ x = Sigmoid()(x)
 x = Linear(W2i, b2i)(x)
 
 feed_dict = {
-    Xi: X,
-    yi: y,
     W1i: W1,
     b1i: b1,
     W2i: W2,
@@ -49,6 +46,4 @@ feed_dict = {
 
 model = Model(inputs=[Xi], outputs=[x])
 model.compile(loss='mse')
-# TODO: Create the yi inside the training. Also, Xi is already in the model. Moreover: x it's the network output
 model.train(X, y, feed_dict=feed_dict, epochs=1000, batch_size=32)
-model.summary()

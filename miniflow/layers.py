@@ -74,6 +74,7 @@ class Input(Layer):
         # The most important property on an Input is value.
         # self.value is set during `topological_sort` later.
         Layer.__init__(self, *args, **kwargs)
+        self.trainable = False
 
     def forward(self):
         # Do nothing because nothing is calculated.
@@ -91,6 +92,19 @@ class Input(Layer):
             self.gradients[self] += n.gradients[self]
 
 
+class Variable(Input):
+    """
+    A generic Input layer that is trainable by default.
+    It should be used for internal parameters that should be modified..
+    """
+    def __init__(self, *args, **kwargs):
+        """
+        Force the trainable property
+        """
+        Input.__init__(self, *args, *kwargs)
+        self.trainable = True
+
+
 class Linear(Layer):
     """
     Represents a node that performs a linear transform.
@@ -98,7 +112,7 @@ class Linear(Layer):
     def __init__(self, W, b, *args, **kwargs):
         # The base class constructor. Weights and bias
         # are treated like inbound nodes.
-        Layer.__init__(self, *args,**kwargs)
+        Layer.__init__(self, *args, **kwargs)
         self.W = W
         self.b = b
         self.inbounds.append(W)
