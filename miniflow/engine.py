@@ -42,12 +42,22 @@ def topological_sort(feed_dict):
     return L
 
 
+def forward(graph):
+    """
+    Performs a forward pass through a list of sorted Nodes and return the results.
+    Arguments:
+        `graph`: The result of calling `topological_sort`.
+    """
+    # Forward pass
+    for n in graph:
+        n.forward()
+    return graph[-1].value
+
+
 def forward_and_backward(graph):
     """
     Performs a forward pass and a backward pass through a list of sorted Nodes.
-
     Arguments:
-
         `graph`: The result of calling `topological_sort`.
     """
     # Forward pass

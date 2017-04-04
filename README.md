@@ -7,7 +7,27 @@ It's a Small Deep Learning framework based on NymPy. The only purpose it has is 
 ./tools/install.sh
 ```
 
-## Examples:
+## Boston Housing Dataset Example
+This dataset contains information collected by the U.S Census Service concerning housing in the area of Boston Mass.
+First we should load the data using SkLearn and split it into training and validation sets:
+
+```python
+data = load_boston()
+X = data['data']
+y = data['target']
+
+# Normalize data
+X = (X - np.mean(X, axis=0)) / np.std(X, axis=0)
+
+# Split between train/test sets:
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20)
+print("Shapes X_train: {} y_train:{} X_test:{} y_test:{}".format(X_train.shape, y_train.shape, X_test.shape, y_test.shape))
+```
+```bash
+Shapes X_train: (404, 13) y_train:(404,) X_test:(102, 13) y_test:(102,)
+```
+
+Then we should crete the input placeholders and network trainable variables (weights and biases). Finally, contruct the network model and topology. Now we are ready to train it:
 ```python
 # Neural network inputs (X and y):
 Xi = Input(name="X_input")
@@ -27,7 +47,8 @@ x = Linear(W2i, b2i)(x)
 model = Model(inputs=[Xi], outputs=[x])
 # Compile the model
 model.compile(loss='mse')
-model.train(X, y, epochs=1000, batch_size=32, feed_dict = {
+# Train the model. History will return all the information:
+history = model.train(X, y, epochs=60, batch_size=32, feed_dict = {
     W1i: W1,
     b1i: b1,
     W2i: W2,
@@ -35,13 +56,28 @@ model.train(X, y, epochs=1000, batch_size=32, feed_dict = {
 })
 ```
 ```bash
-Training:   [####################################]  100%
-Epoch: 1, Loss: 864.557
-Training:   [####################################]  100%
-Epoch: 2, Loss: 24.480
-Training:   [####################################]  100%
-Epoch: 3, Loss: 20.955
+Epoch 1:   [####################################]  100%
+Train Loss: 250.873 - Test Loss: 162.021
+Epoch 2:   [####################################]  100%
+Train Loss: 25.638 - Test Loss: 28.772
+Epoch 3:   [####################################]  100%
+Train Loss: 23.033 - Test Loss: 27.322
 ...
-Training:   [####################################]  100%
-Epoch: 1000, Loss: 0.219
+Epoch 60:   [####################################]  100%
+Train Loss: 5.642 - Test Loss: 13.396
 ```
+
+Now let's analyze the results:
+```python
+import matplotlib.pyplot as plt
+
+plt.figure()
+plt.title("Training vs Testing Performance")
+plt.xlabel("Iteration")
+plt.ylabel("Loss")
+plt_train, = plt.plot(history['train_loss'], '--', color="gainsboro", label='Training')
+plt_test, = plt.plot(history['test_loss'], color='cornflowerblue', label='Testing')
+plt.legend(handles=[plt_train, plt_test])
+plt.show()
+```
+![](docs/example_boston.png)

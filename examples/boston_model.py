@@ -22,7 +22,7 @@ print("Shapes X_train: {} y_train:{} X_test:{} y_test:{}".format(X_train.shape, 
 
 # Configuration
 n_features = X_train.shape[1]
-n_hidden = 100
+n_hidden = 64
 
 # Layers Weights:
 W1 = np.random.randn(n_features, n_hidden)
@@ -53,4 +53,17 @@ feed_dict = {
 
 model = Model(inputs=[Xi], outputs=[x])
 model.compile(loss='mse')
-model.train(X_train, y_train, feed_dict=feed_dict, epochs=1000, batch_size=32)
+history = model.train(X_train, y_train, feed_dict=feed_dict, X_test=X_test, y_test=y_test, epochs=60, batch_size=64)
+
+#
+# Plot the results
+#
+import matplotlib.pyplot as plt
+plt.figure()
+plt.title("Training vs Testing Performance")
+plt.xlabel("Iteration")
+plt.ylabel("Loss")
+plt_train, = plt.plot(history['train_loss'], '--', color="gainsboro", label='Training')
+plt_test, = plt.plot(history['test_loss'], color='cornflowerblue', label='Testing')
+plt.legend(handles=[plt_train, plt_test])
+plt.show()
