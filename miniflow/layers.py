@@ -267,8 +267,6 @@ class ReLU(Layer):
         # Sum the partial with respect to the input over all the outputs.
         for n in self.outbounds:
             grad_cost = n.gradients[self]
-            print(self.relu_derivative(self.value).shape)
-            print(grad_cost.shape)
             self.gradients[self.inbounds[0]] += self.relu_derivative(self.value) * grad_cost
 
 class Softmax(Layer):
