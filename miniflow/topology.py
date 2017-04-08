@@ -80,8 +80,8 @@ class Model(object):
                         test_loss += ouput
                         #history['test_loss'].append(test_loss)
 
-            history['train_loss'].append(loss)
-            history['test_loss'].append(test_loss)
+            history['train_loss'].append(loss/steps_per_epoch)
+            history['test_loss'].append(test_loss/steps_per_epoch)
             print("Train Loss: {:.3f} - Test Loss: {:.3f}".format(loss / steps_per_epoch, test_loss / steps_per_epoch))
 
         return history
