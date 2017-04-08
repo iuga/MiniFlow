@@ -105,6 +105,32 @@ class Variable(Input):
         self.trainable = True
 
 
+class Identity(Layer):
+    """
+    An Identity Layer.
+    """
+    def __init__(self, *args, **kwargs):
+        # The base class constructor has to run to set all
+        # the properties here.
+        # The most important property on an Input is value.
+        # self.value is set during `topological_sort` later.
+        Layer.__init__(self, *args, **kwargs)
+        self.trainable = False
+
+    def forward(self):
+        # Do nothing because nothing is calculated.
+        self.value = self.inbounds[0].value
+
+    def backward(self):
+        # An Input node has no inputs so the gradient (derivative) is zero.
+        # The key, `self`, is reference to this object.
+        self.gradients = {n: np.ones_like(n.value) for n in self.inbounds}
+        # Weights and bias may be inputs, so you need to sum
+        # the gradient from output gradients.
+        for n in self.outbounds:
+            self.gradients[self] += n.gradients[self]
+
+
 class Linear(Layer):
     """
     Represents a node that performs a linear transform.
@@ -156,7 +182,7 @@ class Sigmoid(Layer):
         # The base class constructor.
         Layer.__init__(self, *args, **kwargs)
 
-    def _sigmoid(self, x):
+    def sigmoid(self, x):
         """
         This method is separate from `forward` because it
         will be used with `backward` as well.
@@ -165,12 +191,19 @@ class Sigmoid(Layer):
         """
         return 1. / (1. + np.exp(-x))
 
+    def sigmoid_derivative(self, x):
+        """
+        Compute the sigmoid derivative
+        `x`: A numpy array-like object.
+        """
+        return x * (1. - x) 
+    
     def forward(self):
         """
         Perform the sigmoid function and set the value.
         """
         input_value = self.inbounds[0].value
-        self.value = self._sigmoid(input_value)
+        self.value = self.sigmoid(input_value)
 
     def backward(self):
         """
@@ -182,5 +215,97 @@ class Sigmoid(Layer):
         # Sum the partial with respect to the input over all the outputs.
         for n in self.outbounds:
             grad_cost = n.gradients[self]
-            sigmoid = self.value
-            self.gradients[self.inbounds[0]] += sigmoid * (1 - sigmoid) * grad_cost
+            self.gradients[self.inbounds[0]] += self.sigmoid_derivative(self.value) * grad_cost
+
+
+class ReLU(Layer):
+    """
+    Rectified Linear Unit
+    Represents a node that performs the ReLU activation function.
+    In the context of artificial neural networks, the rectifier is an activation function 
+    defined as max(0, x) where x is the input to a neuron.  
+    """
+    def __init__(self, *args, **kwargs):
+        # The base class constructor.
+        Layer.__init__(self, *args, **kwargs)
+
+    def relu(self, x):
+        """
+        Basically, it sets anything less than or equal to 0 (negative numbers) to be 0. 
+        And keeps all the same values for any values > 0.
+        `x`: A numpy array-like object.
+        """
+        # ReLU returns x if x>0, else 0: x * (x > 0)
+        # np.maximum(x, 0, x)
+        return x * (x > 0)
+    
+    def relu_derivative(self, x):
+        """
+        A "derivative" is just the slope of the graph at certain point. 
+        So what is the slope of the graph at the point x=2? 1!
+        This holds everywhere > 0, the slope is 1.
+        `x`: A numpy array-like object.
+        """
+        # ReLU returns 1 if x>0, else 0: 1 * (x > 0)
+        return 1 * (x > 0)
+
+    def forward(self):
+        """
+        Perform the ReLU function and set the value.
+        """
+        input_value = self.inbounds[0].value
+        self.value = self.relu(input_value)
+
+    def backward(self):
+        """
+        Calculates the gradient using the derivative of the ReLU function.
+        Now just looking at the equation  f(x)=max(0,x), it was not clear to me what the derivative is.
+        Everywhere > 0, the slope is 1.
+        """
+        # Initialize the gradients to 0.
+        self.gradients = {n: np.zeros_like(n.value) for n in self.inbounds}
+        # Sum the partial with respect to the input over all the outputs.
+        for n in self.outbounds:
+            grad_cost = n.gradients[self]
+            print(self.relu_derivative(self.value).shape)
+            print(grad_cost.shape)
+            self.gradients[self.inbounds[0]] += self.relu_derivative(self.value) * grad_cost
+
+class Softmax(Layer):
+    """
+    Used to predict if some input belongs to one of many classes (classification problem).
+    The softmax function squashes the outputs of each unit to be between 0 and 1, just like a sigmoid.
+    It also divides each output such that the total sum of the outputs is equal to 1.
+    The output of the softmax function is equivalent to a categorical probability distribution, it tells
+    you the probability that any of the classes are true (softmax normalizes the outputs so that they sum to one).
+    Also, we need to consider the numerical stability.
+
+    Links and Resources:
+    http://eli.thegreenplace.net/2016/the-softmax-function-and-its-derivative/
+    """
+    def __init__(self, *args, **kwargs):
+        # The base class constructor.
+        Layer.__init__(self, *args, **kwargs)
+
+    def forward(self):
+        """
+        Compute the softmax of vector x in a numerically stable way:
+        """
+        x = self.inbounds[0].value
+        shiftx = x - np.max(x)
+        exps = np.exp(shiftx)
+        self.value = exps / np.sum(exps)
+
+    def backward(self):
+        """
+        Calculates the gradient using the derivative of
+        the sigmoid function.
+        """
+        # Initialize the gradients to 0.
+        self.gradients = {n: np.zeros_like(n.value) for n in self.inbounds}
+        # Sum the partial with respect to the input over all the outputs.
+        for n in self.outbounds:
+            grad_cost = n.gradients[self]
+            x = self.value
+            # TODO: Define the derivative
+            self.gradients[self.inbounds[0]] +=  grad_cost

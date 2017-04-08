@@ -3,6 +3,7 @@ from miniflow.layers import Input
 from sklearn.utils import resample
 from miniflow.losses import MSE
 from click import progressbar
+from sys import stdout
 
 
 class Model(object):
@@ -50,7 +51,7 @@ class Model(object):
         for i in range(epochs):
             loss = 0
             test_loss = 0
-            with progressbar(range(steps_per_epoch), label='Epoch {}: '.format(i + 1)) as bar:
+            with progressbar(range(steps_per_epoch), label='Epoch {}: '.format(i + 1), file=stdout) as bar:
                 for j in bar:
                     # Step 1
                     # Randomly sample a batch of examples
