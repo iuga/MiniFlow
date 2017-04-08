@@ -27,7 +27,7 @@ class Model(object):
         # Create the Loss function as a layer:
         self.loss = self.losses.get(loss, MSE)
 
-    def train(self, X_train, y_train, feed_dict={}, X_test=None, y_test=None, epochs=1000, batch_size=128):
+    def train(self, X_train, y_train, feed_dict={}, X_test=None, y_test=None, epochs=1000, batch_size=128, learning_rate=0.01):
         # Total number of examples
         steps_per_epoch = X_train.shape[0] // batch_size
         # Sort the graph
@@ -66,10 +66,10 @@ class Model(object):
                     forward_and_backward(self.graph)
 
                     # Step 3
-                    sgd_update(trainables, learning_rate=0.05)
+                    sgd_update(trainables, learning_rate=learning_rate)
 
+                    # Step 4
                     loss += self.graph[-1].value
-                    #history['train_loss'].append(loss)
 
                     # Measure the results in a test set:
                     if X_test is not None and y_test is not None:
@@ -78,10 +78,9 @@ class Model(object):
                         y_input_value.value = y_test
                         ouput = forward(self.graph)
                         test_loss += ouput
-                        #history['test_loss'].append(test_loss)
 
-            history['train_loss'].append(loss/steps_per_epoch)
-            history['test_loss'].append(test_loss/steps_per_epoch)
+            history['train_loss'].append(loss / steps_per_epoch)
+            history['test_loss'].append(test_loss / steps_per_epoch)
             print("Train Loss: {:.3f} - Test Loss: {:.3f}".format(loss / steps_per_epoch, test_loss / steps_per_epoch))
 
         return history
