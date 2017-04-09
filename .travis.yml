@@ -22,4 +22,4 @@ install:
   - ./tools/install.sh
 script:
   # Your test script goes here
-  - ./tools/run_test.sh
+  - ./tools/run_tests.sh
