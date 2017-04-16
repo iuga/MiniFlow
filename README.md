@@ -1,7 +1,9 @@
 # MiniFlow
-It's a Small Deep Learning framework based on NymPy. The only purpose it has is learn how networks work internally. The code is extremelly well documented and it's easy to follow.
+It's a tiny educative Deep Learning framework based on NumPy. The only purpose it to have a learning through play environment to understand how networks work internally. The code is extremely well documented and it's natural to follow and modify. Originally, it was a playground in a Udacity course, now it's fully utilizable for you ramp-up datasets.
 
-> All we have to do is to come up with a way to find the weights that minimize the loss
+![](docs/main_screenshot.png)
+
+> All we have to do is to come up with a way to find the weights that minimize the loss - Andrej Karpathy
 
 ## Usage Instalation
 ```bash
@@ -14,8 +16,13 @@ pip install --upgrade git+https://github.com/iuga/MiniFlow
 ./tools/install.sh
 ```
 
-## Boston Housing Dataset Example
-This dataset contains information collected by the U.S Census Service concerning housing in the area of Boston Mass.
+# What's next?
+- First steps and examples:
+  - [Boston Housing Example](./examples/Boston Housing Example.ipynb)
+  - [Wine Quality Example](./examples/Wine Quality.ipynb)
+
+## Deep dive into a regression problem
+The dataset contains information collected by the U.S Census Service concerning housing in the area of Boston Mass.
 First we should load the data using SkLearn and split it into training and validation sets:
 
 ```python
