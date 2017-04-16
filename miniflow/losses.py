@@ -1,6 +1,19 @@
 import numpy as np
 from miniflow.layers import Layer
 
+"""
+Loss/Cost/Objective Functions
+-----------------------------
+Function that maps an event or values of one or more variables into a real number intuitively representing
+some "cost" associated with the event.
+Intuitively, the loss will be high if we're doing a poor job of clasifying the training data, and it will
+be low if we're doing well.
+
+In other words, the loss function measures how compatible a given set of parameters is with respect to the
+ground truth labels in the training dataset. It's defined in such way that making good predictions on the
+training data is equivalent to having a small loss.
+"""
+
 
 class MSE(Layer):
     def __init__(self, y_true):

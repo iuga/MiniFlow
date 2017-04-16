@@ -133,7 +133,18 @@ class Identity(Layer):
 
 class Linear(Layer):
     """
-    Represents a node that performs a linear transform.
+    Represents a node that performs a linear transform: 
+    output = f(xi, W, b) = Wx+b 
+    where:
+        xi: Input data
+        W: weights matrix
+        b: bias vector
+
+    The weights matrix `W` is learned from a set of labeled training samples.
+
+    The biases vector `b` allow our classifiers to translate the lines. Note that without the
+    bias terms, plugging in xi=0 would always give a score of zero regardless the weights.
+    (The line is forced to cross the origin)
     """
     def __init__(self, W, b, *args, **kwargs):
         # The base class constructor. Weights and bias
@@ -146,7 +157,8 @@ class Linear(Layer):
 
     def forward(self):
         """
-        Performs the math behind a linear transform.
+        Performs the math behind a linear transform:
+        f(xi, W, b) = Wx+b
         """
         X = self.inbounds[0].value
         W = self.W.value
@@ -269,6 +281,7 @@ class ReLU(Layer):
             grad_cost = n.gradients[self]
             self.gradients[self.inbounds[0]] += self.relu_derivative(self.value) * grad_cost
 
+
 class Softmax(Layer):
     """
     Used to predict if some input belongs to one of many classes (classification problem).
@@ -277,6 +290,8 @@ class Softmax(Layer):
     The output of the softmax function is equivalent to a categorical probability distribution, it tells
     you the probability that any of the classes are true (softmax normalizes the outputs so that they sum to one).
     Also, we need to consider the numerical stability.
+
+    softmax = -log( e^x / sum(e^x) )
 
     Links and Resources:
     http://eli.thegreenplace.net/2016/the-softmax-function-and-its-derivative/
@@ -287,7 +302,9 @@ class Softmax(Layer):
 
     def forward(self):
         """
-        Compute the softmax of vector x in a numerically stable way:
+        Compute the softmax of vector x in a numerically stable way.
+        The Softmax classifier is hence minimizing the cross-entropy between the estimated class probabilities
+        and the "true" distribution.
         """
         x = self.inbounds[0].value
         shiftx = x - np.max(x)
