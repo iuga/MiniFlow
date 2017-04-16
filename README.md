@@ -18,8 +18,8 @@ pip install --upgrade git+https://github.com/iuga/MiniFlow
 
 # What's next?
 - First steps and examples:
-  - [Boston Housing Example](./examples/Boston Housing Example.ipynb)
-  - [Wine Quality Example](./examples/Wine Quality.ipynb)
+  - [Boston Housing Example](examples/BostonHousingExample.ipynb)
+  - [Wine Quality Example](examples/WineQuality.ipynb)
 
 ## Deep dive into a regression problem
 The dataset contains information collected by the U.S Census Service concerning housing in the area of Boston Mass.
