@@ -1,4 +1,4 @@
-from miniflow.engine import topological_sort, forward, forward_and_backward, sgd_update
+from miniflow.engine import Engine
 from miniflow.layers import Input
 from sklearn.utils import resample
 from miniflow.losses import MSE
@@ -13,12 +13,16 @@ class Model(object):
     losses = {
         'mse': MSE
     }
+    optimizers = {
+        'sgd': 'sgd'
+    }
 
     def __init__(self, inputs, outputs):
         self.inputs = inputs
         self.outputs = outputs
         self.optimizer = None
         self.loss = None
+        self.engine = Engine()
 
     def compile(self, optimizer='sdg', loss='mse'):
         """
@@ -31,7 +35,7 @@ class Model(object):
         # Total number of examples
         steps_per_epoch = X_train.shape[0] // batch_size
         # Sort the graph
-        self.graph = topological_sort(feed_dict)
+        self.graph = self.engine.topological_sort(feed_dict)
         # Network Inputs:
         y_input_value = Input(trainable=False, name="y_input")
         # Add the loss layer in the graph:
@@ -63,10 +67,10 @@ class Model(object):
                     y_input_value.value = y_batch
 
                     # Step 2
-                    forward_and_backward(self.graph)
+                    self.engine.forward_and_backward(self.graph)
 
                     # Step 3
-                    sgd_update(trainables, learning_rate=learning_rate)
+                    self.engine.sgd_update(trainables, learning_rate=learning_rate)
 
                     # Step 4
                     loss += self.graph[-1].value
@@ -76,7 +80,7 @@ class Model(object):
                         for input in self.inputs:
                             input.value = X_test
                         y_input_value.value = y_test
-                        ouput = forward(self.graph)
+                        ouput = self.engine.forward(self.graph)
                         test_loss += ouput
 
             history['train_loss'].append(loss / steps_per_epoch)
