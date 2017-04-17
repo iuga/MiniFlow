@@ -101,7 +101,7 @@ class Variable(Input):
         """
         Force the trainable property
         """
-        Input.__init__(self, *args, *kwargs)
+        Input.__init__(self, *args, **kwargs)
         self.trainable = True
 
 
