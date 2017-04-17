@@ -17,7 +17,9 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - ./tools/install.sh
+  - conda create --yes --name miniflow numpy scikit-learn pytest
+  - source activate miniflow
+  - python setup.py install
 script:
-  # Your test script goes here
-  - ./tools/run_tests.sh
+  - source activate miniflow
+  - py.test -s ./tests/
