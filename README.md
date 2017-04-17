@@ -1,4 +1,6 @@
 # MiniFlow
+![](https://travis-ci.org/iuga/MiniFlow.svg?branch=master)
+
 It's a tiny educative Deep Learning framework based on NumPy. The only purpose it to have a learning through play environment to understand how networks work internally. The code is extremely well documented and it's natural to follow and modify. Originally, it was a playground in a Udacity course, now it's fully utilizable for you ramp-up datasets.
 
 ![](docs/main_screenshot.png)
