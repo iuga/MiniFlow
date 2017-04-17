@@ -58,7 +58,7 @@ def test_e2e_training_with_boston_dataset():
     # Assertions:
     # First Iteration the loss is over 200
     # In the last iteration the loss should be less than 20
-    assert history['train_loss'][0] > 200
+    assert history['train_loss'][0] > 100
     assert history['train_loss'][-1] < 25
-    assert history['test_loss'][0] > 200
+    assert history['test_loss'][0] > 100
     assert history['test_loss'][-1] < 25
